@@ -106,7 +106,7 @@ class Differ{
 
                     $column_value = "{$column->name} {$column->type}{$length_precision}";
                     $column_value.= $column->nullable ? '' : ' NOT NULL';
-                    $column_value.= $column->default ? ' DEFAULT '.$column->default : '';
+                    $column_value.= is_null($column->default) ? '' : ' DEFAULT '.$column->default;
                     $column_value.= $column->unsigned ? ' unsigned' : '';
                     $column_value.= $column->zerofill ? ' zerofill' : '';
                     $column_value.= $column->auto_increment ? ' AUTO_INCREMENT' : '';
@@ -129,7 +129,7 @@ class Differ{
 
                         $column_base_value = "{$column_base->name} {$column_base->type}{$length_precision}";
                         $column_base_value.= $column_base->nullable ? '' : ' NOT NULL';
-                        $column_base_value.= $column_base->default ? ' DEFAULT '.$column_base->default : '';
+                        $column_base_value.= is_null($column_base->default) ? '' : ' DEFAULT '.$column_base->default;
                         $column_base_value.= $column_base->unsigned ? ' unsigned' : '';
                         $column_base_value.= $column_base->zerofill ? ' zerofill' : '';
                         $column_base_value.= $column_base->auto_increment ? ' AUTO_INCREMENT' : '';
@@ -172,7 +172,7 @@ class Differ{
             else{
                 $view_base = $this->schema_base->views[$view->name];
 
-                $this->add("VIEW $view->name", 'VIEW', $view->name, $this->schema_up->name, implode(',', $view->columns), implode('', $view_base->columns));
+                $this->add("VIEW $view->name", 'VIEW', $view->name, $this->schema_up->name, implode(',', $view->columns), implode(',', $view_base->columns));
             }            
         }
 

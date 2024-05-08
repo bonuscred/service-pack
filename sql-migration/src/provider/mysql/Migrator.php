@@ -90,14 +90,27 @@ final class Migrator implements MigratorExtension{
                     $stmt->execute();
 
                     foreach($stmt->fetchAll() as $column){
+                        $column_type = explode(' ', $column['column_type'])[0];
+                        $column_type = str_replace([$column['data_type'], '(', ')'], '', $column_type);
+
+                        if($column_type == ''){
+                            $column_length = null;
+                            $column_precision = null;
+                        }else{
+                            $length_precision = explode(',', $column_type);
+                            $column_length = empty($length_precision[0]) ? null : (int) $length_precision[0];
+                            $column_precision = empty($length_precision[1]) ? null : (int) $length_precision[1];
+                        }
+                        
                         $table->addColumn(
                             $column['column_name'],
                             $column['data_type'],
-                            $column['max_length'],
-                            $column['data_precision'],
+                            $column_length,
+                            $column_precision,
                             $column['column_default'],
                             $column['is_nullable'] == 'YES' ? true : false,
                             stristr($column['extra'], 'auto_increment') !== FALSE ? true : false,
+                            stristr($column['column_type'], 'zerofill') !== FALSE ? true : false,
                             stristr($column['column_type'], 'unsigned') !== FALSE ? true : false
                         );
                     }
