@@ -73,9 +73,7 @@ class Server {
     }
 
     public function enableLogRequest(Log $log){
-        if( $log->isReady() ){
-            $this->log = $log;
-        }
+        $this->log = $log;        
     }
 
     public function setCustomRedirect(
@@ -100,47 +98,6 @@ class Server {
         }           
     }
 
-    public function hasIdempotencyKey(string|Array $keyname, $allow_camelcase = true){
-        $check_value = function($data, $needle, $camelcase){
-            if( !empty($data[$needle]) ){
-                return $data[$needle];
-            }
-
-            if($camelcase){
-                $needle_camelcase_underscore = ucwords($needle, '_');
-                $needle_camelcase_dashe = ucwords($needle, '-');
-
-                if( !empty($data[$needle_camelcase_underscore]) ){
-                    return $data[$needle_camelcase_underscore];
-                }
-
-                if( !empty($data[$needle_camelcase_dashe]) ){
-                    return $data[$needle_camelcase_dashe];
-                }
-            }
-
-            return null;
-        };
-        
-        $headers = $this->http_data->getHeaderParams();
-
-        if( is_array($keyname) ){
-            foreach( $keyname as $key ){
-                $find_value = $check_value($headers, $key, $allow_camelcase);
-                if($find_value){
-                    $this->http_data->setIdempotency($key, $find_value);    
-                    return;
-                }
-            }        
-        }else{
-            $find_value = $check_value($headers, $keyname, $allow_camelcase);
-            if($find_value){
-                $this->http_data->setIdempotency($keyname, $find_value);    
-                return;
-            }    
-        }
-    }
-    
     private function validateRoutePath(Route $route){
         $http_data = $this->http_data;
         
@@ -242,43 +199,6 @@ class Server {
         return $this->notfound_route;
     }
 
-    private function printLogResponse(Response $response):bool {
-        if($this->log){
-            $idempotency = $this->http_data->getIdempotency();
-            
-            if(!empty($idempotency)){                    
-                $idempotency_key = $idempotency['key'];
-                $idempotency_value = $idempotency['value'];
-
-                $response->addHeader("{$idempotency_key}: {$idempotency_value}");
-                
-                $previous_response = $this->log->findByIdempotency($idempotency_key, $idempotency_value);
-
-                if($previous_response){
-                    if( 
-                        $previous_response->http_method != $this->http_data->getRequestMethod() ||
-                        $previous_response->uri != $this->http_data->getRequestUri()
-                    ){
-                        $response->send(403, 'Idempotency key used on another endpoint.');
-                    }
-                    else{
-                        $code = (int) $previous_response->response_code;
-                        $headers = json_decode($previous_response->response_headers, true);
-                        $body = $previous_response->response_body;
-                        
-                        $response->echo($code, $headers, $body);
-                    }
-
-                    $this->log = null;
-
-                    return true;                        
-                }
-            }                
-        }
-
-        return false;
-    }
-
     public function browse(Response $response){  
         $send_to_service = false;
         
@@ -316,13 +236,10 @@ class Server {
                     $this->http_data = $middleware->getHttpData();                
                 }
 
-                // Verifica se houve resposta pela chave de idempotencia
-                if(!$this->printLogResponse($response)){
-                    $send_to_service = true;
+                $send_to_service = true;
     
-                    $response->setServerHttpData($this->http_data);
-                    $response->exec($route->getController(), $route->getMethod());
-                }
+                $response->setServerHttpData($this->http_data);
+                $response->exec($route->getController(), $route->getMethod());                
             }
         } catch(ServerException $e){
             $response->send($e->getCode(), $e->getMessage());

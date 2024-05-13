@@ -7,6 +7,7 @@ use ApiManager\Http\Data;
 abstract class Response {
     
     private $server_http_data;
+    private $idempotencykey;
     private $body;
     
     abstract public function exec($controller, $method);
@@ -19,7 +20,11 @@ abstract class Response {
 
     protected function setBody(string|null $body){
         $this->body = $body;
-    }    
+    } 
+    
+    protected function setIdempotencykey(string $key){
+        $this->idempotencykey = $key;
+    }
 
     protected function getServerHttpData(){
         return $this->server_http_data;    
@@ -37,6 +42,10 @@ abstract class Response {
 
     public function getBody(){
         return $this->body;    
+    }
+
+    public function getIdempotencykey(){
+        return $this->idempotencykey;
     }
     
     public function setServerHttpData(Data $server_http_data){

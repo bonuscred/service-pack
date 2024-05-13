@@ -44,12 +44,12 @@ class LogData{
             $this->sufix = $data->getSufixUri();
             $this->header_params = json_encode($data->getHeaderParams());
             $this->creation_datetime = $data->getDatetime();
-            $this->idempotencykey = empty($data->getIdempotency()) ? null : $data->getIdempotency()['key'].':'.$data->getIdempotency()['value'];
         }
         else if($data instanceof Response){
             $this->response_code = $data->getCode();
             $this->response_headers = $data->getHeaders(true);
-            $this->response_body = $data->getBody();            
+            $this->response_body = $data->getBody();          
+            $this->idempotencykey = $data->getIdempotencykey();  
         }
         else{
             foreach($data as $key => $value){

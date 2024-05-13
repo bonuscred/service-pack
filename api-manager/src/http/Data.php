@@ -18,8 +18,7 @@ class Data {
     private $header_params;
     private $body_params;
     private $query_params;
-    private $middleware_params;    
-    private $idempotency;
+    private $middleware_params;
 
 
     public function __construct($server_id = null, $prefix_uri = null){
@@ -43,7 +42,6 @@ class Data {
         $this->getBodyParams();
         $this->query_params = [];
         $this->middleware_params = [];
-        $this->idempotency = null;
     }
 
     public function getDatetime(){
@@ -185,18 +183,7 @@ class Data {
 
     public function addMiddlewareParam(string $key, mixed $value){
         $this->middleware_params[$key] = $value;
-    }
-
-    public function getIdempotency(){
-        return $this->idempotency;
-    }
-
-    public function setIdempotency(string $key, string $value){
-        $this->idempotency = [
-            'key' => $key,
-            'value' => $value
-        ];
-    }    
+    }   
 
     public function getRequestParams(){
         return array_merge(
