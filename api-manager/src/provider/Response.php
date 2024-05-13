@@ -34,10 +34,8 @@ abstract class Response {
         return http_response_code();
     }
 
-    public function getHeaders($as_string = false){
-        $headers =headers_list();
-        
-        return $as_string ? json_encode($headers) : $headers;
+    public function getHeaders(){
+        return headers_list();
     }
 
     public function getBody(){

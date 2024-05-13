@@ -2,12 +2,10 @@
 
 namespace RestClient\Extension;
 
-use RestClient\Response;
+use RestClient\Log\LogData;
 
 interface LogExtension{
 
-    public function isReady():bool;
-
-    public function register(Response $response):void;
+    public function register(LogData $data):void;
 
 }

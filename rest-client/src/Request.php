@@ -3,6 +3,7 @@
 namespace RestClient;
 
 use RestClient\Extension\LogExtension;
+use RestClient\Log\LogData;
 
 class Request {
     // Alias for the last RestClientResponse received
@@ -86,9 +87,7 @@ class Request {
     }
     
     public function enableLog(LogExtension $log){
-        if($log->isReady()){
-            $this->logger = $log;
-        }
+        $this->logger = $log;        
     }
 
     //If $key = null returns the last RestClientResponse object received
@@ -278,8 +277,11 @@ class Request {
 
         empty($this->response_history) ? $this->response_history[1] = $response : $this->response_history[] = $response;
 
-        if($this->logger){            
-            $this->logger->register($response);
+        if($this->logger){          
+            $logdata = new LogData;
+            $logdata->parse($response);  
+            
+            $this->logger->register($logdata);
         }
 
         return $response;

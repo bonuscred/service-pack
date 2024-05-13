@@ -5,6 +5,5 @@ return array(
     'RestClient\RequestParams'          => __DIR__.'/src/RequestParams.php',
     'RestClient\Response'               => __DIR__.'/src/Response.php',
     'RestClient\Extension\LogExtension' => __DIR__.'/src/extension/LogExtension.php',
-    'RestClient\Log\LogSQL'             => __DIR__.'/src/log/LogSQL.php',
-    'RestClient\Log\LogFile'            => __DIR__.'/src/log/LogFile.php',
+    'RestClient\Log\LogData'            => __DIR__.'/src/log/LogData.php',
 );

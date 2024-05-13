@@ -30,9 +30,9 @@ class LogData{
 
     public function parse(Array|Data|Response $data):void {
         if($data instanceof Data){
-            $this->body_params = empty($data->getBodyParams()) ? null : json_encode($data->getBodyParams()); 
-            $this->query_params = empty($data->getQueryParams()) ? null : json_encode($data->getQueryParams()); 
-            $this->middleware_params = empty($data->getMiddlewareParams()) ? null : json_encode($data->getMiddlewareParams()); 
+            $this->body_params = $data->getBodyParams(); 
+            $this->query_params = $data->getQueryParams(); 
+            $this->middleware_params = $data->getMiddlewareParams(); 
             $this->server_id = $data->getServerId();
             $this->request_id = $data->getRequestId();
             $this->server_name = $data->getServerName();
@@ -42,12 +42,12 @@ class LogData{
             $this->http_method = $data->getRequestMethod();
             $this->prefix = $data->getPrefixUri();
             $this->sufix = $data->getSufixUri();
-            $this->header_params = json_encode($data->getHeaderParams());
+            $this->header_params = $data->getHeaderParams();
             $this->creation_datetime = $data->getDatetime();
         }
         else if($data instanceof Response){
             $this->response_code = $data->getCode();
-            $this->response_headers = $data->getHeaders(true);
+            $this->response_headers = $data->getHeaders();
             $this->response_body = $data->getBody();          
             $this->idempotencykey = $data->getIdempotencykey();  
         }
